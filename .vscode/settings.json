@@ -1,0 +1,7 @@
+{
+    "python.formatting.autopep8Path": "/Library/Frameworks/Python.framework/Versions/3.11/bin/autopep8",
+    "python.linting.pylintEnabled": true,
+    "python.analysis.diagnosticSeverityOverrides": {
+      "reportGeneralTypeIssues": "none"
+    }
+ }
