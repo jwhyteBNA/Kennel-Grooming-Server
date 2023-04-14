@@ -1,12 +1,22 @@
 {
     "version": "0.2.0",
     "configurations": [
-        
+
         {
-            "name": "Request Handler",
+            "name": "REQUEST HANDLER",
             "type": "python",
             "request": "launch",
             "program": "./request_handler.py",
+            "console": "integratedTerminal",
+            "autoReload": {
+                "enable": true
+            }
+        },
+        {
+            "name": "Pioneer",
+            "type": "python",
+            "request": "launch",
+            "program": "./server.py",
             "console": "integratedTerminal",
             "autoReload": {
                 "enable": true
