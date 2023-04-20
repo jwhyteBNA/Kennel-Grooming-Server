@@ -51,7 +51,7 @@ class HandleRequests(BaseHTTPRequestHandler):
         content_len = int(self.headers.get('content-length', 0))
         post_body = self.rfile.read(content_len)
         post_body = json.loads(post_body)
-        (resource, id) = self.parse_url(self.path)
+        (resource, _) = self.parse_url(self.path)
         new_resource = None
         required_fields = {
             "animals": ["name", "species", "locationId", "customerId", "status"],
