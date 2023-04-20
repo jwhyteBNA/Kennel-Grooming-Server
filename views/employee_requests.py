@@ -1,6 +1,6 @@
 import sqlite3
 import json
-from models import Employee
+from models import Employee, Location
 
 EMPLOYEES = [
     {
@@ -21,11 +21,15 @@ def get_all_employees():
         # Write the SQL query to get the information you want
         db_cursor.execute("""
         SELECT
-            a.id,
-            a.name,
-            a.address,
-            a.location_id
-        FROM employee a
+            e.id,
+            e.name,
+            e.address,
+            e.location_id,
+            l.name location_name,
+            l.address location_address
+        FROM Employee e
+        JOIN Location l
+            ON l.id = e.location_id
         """)
 
         # Initialize an empty list to hold all employee representations
@@ -42,6 +46,10 @@ def get_all_employees():
             # exact order of the parameters defined in the
             # Employee class above.
             employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
+
+            location = Location(row['id'], row['location_name'], row['location_address'])
+
+            employee.location = location.__dict__
 
             employees.append(employee.__dict__)
 
@@ -99,22 +107,56 @@ def get_employees_by_location(location_id):
 
     return employees
 
-def create_employee(employee):
-    """Create New Employee"""
-    max_id = EMPLOYEES[-1]["id"]
-    new_id = max_id + 1
-    employee["id"] = new_id
-    EMPLOYEES.append(employee)
-    return employee
+def create_employee(new_employee):
+    """Add to SQL Database"""
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        INSERT INTO Employee
+            ( name, address, location_id  )
+        VALUES
+            ( ?, ?, ?);
+        """, (new_employee['name'], new_employee['address'], new_employee['location_id']))
+
+        # The `lastrowid` property on the cursor will return
+        # the primary key of the last thing that got added to
+        # the database.
+        id = db_cursor.lastrowid
+
+        # Add the `id` property to the employee dictionary that
+        # was sent by the client so that the client sees the
+        # primary key in the response.
+        new_employee['id'] = id
+
+    return new_employee
+
+# def create_employee(employee):
+#     """Create New Employee"""
+#     max_id = EMPLOYEES[-1]["id"]
+#     new_id = max_id + 1
+#     employee["id"] = new_id
+#     EMPLOYEES.append(employee)
+#     return employee
 
 def delete_employee(id):
-    """To Delete Employee."""
-    employee_index = -1
-    for index, employee in enumerate(EMPLOYEES):
-        if employee["id"] == id:
-            employee_index = index
-    if employee_index >= 0:
-        EMPLOYEES.pop(employee_index)
+    """DELETE from SQL database"""
+    with sqlite3.connect("./kennel.sqlite3") as conn:
+        db_cursor = conn.cursor()
+
+        db_cursor.execute("""
+        DELETE FROM employee
+        WHERE id = ?
+        """, (id, ))
+
+# def delete_employee(id):
+#     """To Delete Employee."""
+#     employee_index = -1
+#     for index, employee in enumerate(EMPLOYEES):
+#         if employee["id"] == id:
+#             employee_index = index
+#     if employee_index >= 0:
+#         EMPLOYEES.pop(employee_index)
 
 def update_employee(id, new_employee):
     "Edit employee."
