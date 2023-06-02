@@ -1,5 +1,4 @@
 import sqlite3
-import json
 from models import Location
 
 LOCATIONS = [
@@ -26,28 +25,21 @@ def get_all_locations():
 
         # Write the SQL query to get the information you want
         db_cursor.execute("""
-        SELECT
-            a.id,
-            a.name,
-            a.address
-        FROM location a
+        SELECT 
+            l.id,
+            l.name,
+            l.address,
+            COUNT(a.location_id) as animal_count
+        FROM location l
+        JOIN animal a
+            ON l.id = a.location_id
+        GROUP BY a.location_id
         """)
 
-        # Initialize an empty list to hold all location representations
         locations = []
-
-        # Convert rows of data into a Python list
         dataset = db_cursor.fetchall()
-
-        # Iterate list of data returned from database
         for row in dataset:
-
-            # Create an location instance from the current row.
-            # Note that the database fields are specified in
-            # exact order of the parameters defined in the
-            # location class above.
-            location = Location(row['id'], row['name'], row['address'])
-
+            location = Location(row['id'], row['name'], row['address'], row['animal_count'],)
             locations.append(location.__dict__)
 
     return locations
@@ -74,7 +66,7 @@ def get_single_location(id):
         data = db_cursor.fetchone()
 
         # Create an location instance from the current row
-        location = Location(data['id'], data['name'], data['address'])
+        location = Location(data['id'], data['name'], data['address'], data['animal_count'])
 
         return location.__dict__
 

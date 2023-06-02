@@ -86,3 +86,23 @@ SELECT
             ON l.id = e.location_id
 
 SELECT * FROM Animal ORDER BY id DESC;
+
+        SELECT 
+            l.id,
+            l.name,
+            l.address,
+            COUNT(a.location_id) animal_count
+        FROM location l
+        JOIN animal a
+            ON l.id = a.location_id
+        GROUP BY a.location_id
+
+        SELECT
+            l.id,
+            l.name,
+            l.address,
+            COUNT(a.location_id) as animal_count
+        FROM location l
+        JOIN animal a
+            ON l.id = a.location_id
+        GROUP BY a.location_id
